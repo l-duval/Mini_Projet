@@ -145,12 +145,11 @@ static THD_FUNCTION(ProcessImage, arg) {
 		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
 			//extracts first 5bits of the first byte
 			//takes nothing from the second byte
-			image[i/2] = (uint8_t)img_buff_ptr[i]&0xFF + ((uint8_t)img_buff_ptr[i+1]&0xFF)<<8;
+			image[i/2] = ((uint8_t)img_buff_ptr[i]&0xFF + ((uint8_t)img_buff_ptr[i+1]&0xFF)<<8);
 
 			chprintf((BaseSequentialStream *)&SD3, "rouge %x ", image[i/2]&0xF800);
 			chprintf((BaseSequentialStream *)&SD3, "vert %x ", image[i/2]&0x07E0);
 			chprintf((BaseSequentialStream *)&SD3, "bleu %x \n", image[i/2]&0x001F);
-
 
 		}
 
