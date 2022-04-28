@@ -112,12 +112,15 @@ static THD_FUNCTION(CaptureImage, arg) {
 	dcmi_prepare();
 
     while(1){
-        //starts a capture
+    	systime_t time;
+    	time = chVTGetSystemTime();
+    	 //starts a capture
 		dcmi_capture_start();
 		//waits for the capture to be done
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
+		chprintf((BaseSequentialStream *)&SD3, "capture time = %d\n", chVTGetSystemTime()-time);
     }
 }
 
@@ -147,9 +150,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//takes nothing from the second byte
 			image[i/2] = (((uint8_t)img_buff_ptr[i]&0xFF) + (((uint8_t)img_buff_ptr[i+1]&0xFF)<<8));
 
-			chprintf((BaseSequentialStream *)&SD3, "rouge %u \n", image[i/2]&0xF800);
-			chprintf((BaseSequentialStream *)&SD3, "vert %u \n", image[i/2]&0x07E0);
-			chprintf((BaseSequentialStream *)&SD3, "bleu %u \n", image[i/2]&0x001F);
+		//	chprintf((BaseSequentialStream *)&SD3, "rouge %u \n", image[i/2]&0xF800);
+		//	chprintf((BaseSequentialStream *)&SD3, "vert %u \n", image[i/2]&0x07E0);
+		//	chprintf((BaseSequentialStream *)&SD3, "bleu %u \n", image[i/2]&0x001F);
 
 
 
