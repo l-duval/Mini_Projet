@@ -149,7 +149,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 			chprintf((BaseSequentialStream *)&SD3, "rouge %x ", image[i/2]&0xF800);
 			chprintf((BaseSequentialStream *)&SD3, "vert %x ", image[i/2]&0x07E0);
-			chprintf((BaseSequentialStream *)&SD3, "bleu %x ", image[i/2]&0x001F);
+			chprintf((BaseSequentialStream *)&SD3, "bleu %x \n", image[i/2]&0x001F);
 
 
 		}
