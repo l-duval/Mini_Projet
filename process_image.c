@@ -15,6 +15,25 @@ static uint16_t line_position = IMAGE_BUFFER_SIZE/2;	//middle
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
+
+// Morse Logic Test one
+uint8_t flash_on_counter(systime_t time, uint8_t cnt){
+		if(time < 45){
+			return cnt+1;
+		}
+}
+
+uint8_t morse_logic(uint8_t cnt){
+	if((0 < cnt) & (cnt <= 6)){
+		return 1;
+	}
+	if(cnt > 6){
+		return 2;
+	}
+	return 0;
+}
+
+
 /*
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
@@ -120,7 +139,9 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-		chprintf((BaseSequentialStream *)&SD3, "capture time = %d\n", chVTGetSystemTime()-time);
+		uint8_t counter = flash_on_counter(chVTGetSystemTime()-time, 0);
+		chprintf((BaseSequentialStream *)&SD3,"Morse logic = %d" , counter);
+	//	chprintf((BaseSequentialStream *)&SD3, "capture time = %d\n", chVTGetSystemTime()-time);
     }
 }
 
