@@ -99,7 +99,7 @@ uint16_t extract_line_width(uint8_t *buffer){
 	}
 }
 
-static THD_WORKING_AREA(waCaptureImage, 256);
+static THD_WORKING_AREA(waCaptureImage, 256 );
 static THD_FUNCTION(CaptureImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -145,29 +145,31 @@ static THD_FUNCTION(ProcessImage, arg) {
 		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
 			//extracts first 5bits of the first byte
 			//takes nothing from the second byte
-			image[i/2] = ((uint8_t)img_buff_ptr[i]&0xFF + ((uint8_t)img_buff_ptr[i+1]&0xFF)<<8);
+			image[i/2] = (((uint8_t)img_buff_ptr[i]&0xFF) + (((uint8_t)img_buff_ptr[i+1]&0xFF)<<8));
 
-			chprintf((BaseSequentialStream *)&SD3, "rouge %x ", image[i/2]&0xF800);
-			chprintf((BaseSequentialStream *)&SD3, "vert %x ", image[i/2]&0x07E0);
-			chprintf((BaseSequentialStream *)&SD3, "bleu %x \n", image[i/2]&0x001F);
+			chprintf((BaseSequentialStream *)&SD3, "rouge %u \n", image[i/2]&0xF800);
+			chprintf((BaseSequentialStream *)&SD3, "vert %u \n", image[i/2]&0x07E0);
+			chprintf((BaseSequentialStream *)&SD3, "bleu %u \n", image[i/2]&0x001F);
+
+
 
 		}
 
 		//search for a line in the image and gets its width in pixels
-		lineWidth = extract_line_width(image);
+	//	lineWidth = extract_line_width(image);
 
 		//converts the width into a distance between the robot and the camera
-		if(lineWidth){
-			distance_cm = PXTOCM/lineWidth;
-		}
+		//if(lineWidth){
+		//	distance_cm = PXTOCM/lineWidth;
+	//	}
 
-		if(send_to_computer){
+	//	if(send_to_computer){
 			//sends to the computer the image
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-		}
+		//	SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+	//	}
 		//invert the bool
-		send_to_computer = !send_to_computer;
-    }
+		//send_to_computer = !send_to_computer;
+  }
 }
 
 float get_distance_cm(void){
