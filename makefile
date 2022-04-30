@@ -6,12 +6,13 @@
 PROJECT = Mini_Projet
 
 #Define path to the e-puck2_main-processor folder
-GLOBAL_PATH = C:\Users\duval\Documents\EPFL\BA6\Robotique\Projet\lib\e-puck2_main-processor
+GLOBAL_PATH = C:\Users\victo\OneDrive\Bureau\lib\e-puck2_main-processor
 
 #Source files to include
 CSRC += ./main.c \
 		./pi_regulator.c \
 		./process_image.c \
+		./movement.c \
 
 #Header folders to include
 INCDIR +=
