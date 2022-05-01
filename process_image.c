@@ -3,6 +3,7 @@
 #include <chprintf.h>
 #include <usbcfg.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <main.h>
 #include <camera/po8030.h>
 
@@ -17,13 +18,13 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
 
 // Morse Logic Test one
-uint8_t flash_on_counter(systime_t time, uint8_t cnt){
+int flash_on_counter(systime_t time, uint8_t cnt){
 		if(time < 45){
 			return cnt+1;
 		}
 }
 
-uint8_t morse_logic(uint8_t cnt){
+int morse_logic(uint8_t cnt){
 	if((0 < cnt) & (cnt <= 6)){
 		return 1;
 	}
@@ -33,6 +34,18 @@ uint8_t morse_logic(uint8_t cnt){
 	return 0;
 }
 
+int morse_logic_2(int cnt, bool b){
+	if(cnt == 6){
+		b = true;
+		return 0;
+	}
+	if ((b==true) & (cnt ==7)){
+		return 2;
+	}
+	else{
+		return 1;
+	}
+}
 
 /*
  *  Returns the line's width extracted from the image buffer given
@@ -129,6 +142,10 @@ static THD_FUNCTION(CaptureImage, arg) {
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
+	int counter_1 = 0;
+	bool dot_or_line = false;
+
+
 
     while(1){
     	systime_t time;
@@ -139,9 +156,17 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-		uint8_t counter = flash_on_counter(chVTGetSystemTime()-time, 0);
-		chprintf((BaseSequentialStream *)&SD3,"Morse logic = %d" , counter);
-	//	chprintf((BaseSequentialStream *)&SD3, "capture time = %d\n", chVTGetSystemTime()-time);
+		chprintf((BaseSequentialStream *)&SD3, "capture time 1 = %d\n", chVTGetSystemTime()-time);
+//		if (chVTGetSystemTime()-time <= 45){
+//			++counter_1;
+//		}
+//		chprintf((BaseSequentialStream *)&SD3,"Morse logic = %d" , morse_logic_2(counter_1,dot_or_line));
+//		chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
+//		chprintf((BaseSequentialStream *)&SD3, "counter= %d\n", counter_1);
+//		if(morse_logic_2(counter_1,dot_or_line) == (1||2)){
+//			dot_or_line = false;
+//			counter_1 = 0;
+//		}
     }
 }
 
