@@ -120,10 +120,9 @@ static THD_FUNCTION(CaptureImage, arg) {
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
-	int counter_1 = 0;
-	int counter_dot_max =0;
-
-
+	int counter = 0;
+	int counter_delayed = 0;
+	//int time_tab[20];
 
     while(1){
     	systime_t time;
@@ -134,17 +133,25 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-		chprintf((BaseSequentialStream *)&SD3, "capture time 1 = %d\n", chVTGetSystemTime()-time);
-		counter_dot_max = counter_1;
-		if (chVTGetSystemTime()-time <= 45){
-			++counter_1;
+	//	chprintf((BaseSequentialStream *)&SD3, "ct = %d", chVTGetSystemTime()-time);
+		counter_delayed = counter;
+		if (chVTGetSystemTime()-time <= 59){
+			++counter;
+			//time_tab[counter] = chVTGetSystemTime()-time;
 		}
 		else{
-			counter_1 = 0;
+			counter = 0;
 		}
 //		chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
-		chprintf((BaseSequentialStream *)&SD3, "counter= %d\n", counter_1);
-		if((counter_1 != 0)){
+		//chprintf((BaseSequentialStream *)&SD3, "cnt= %d", counter);
+		if((counter_delayed != 0)&(counter_delayed <= 8)){
+				if(counter == 0){
+					chprintf((BaseSequentialStream *)&SD3, " dot %c  ", 0);
+				}
+			}
+		// mettre un bool pr desactiver une fois fait one time puis reactiver apres
+		if(counter_delayed == 10){
+			chprintf((BaseSequentialStream *)&SD3, " line %c  ", 0);
 		}
 
     }
