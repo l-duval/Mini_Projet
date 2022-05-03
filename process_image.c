@@ -17,14 +17,6 @@ static uint16_t line_position = IMAGE_BUFFER_SIZE/2;	//middle
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
 
-// Morse Logic Test one
-int flash_on_counter(systime_t time, uint8_t cnt){
-		if(time < 45){
-			return cnt+1;
-		}
-}
-
-
 /*
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
@@ -122,7 +114,6 @@ static THD_FUNCTION(CaptureImage, arg) {
 	dcmi_prepare();
 	int counter = 0;
 	int counter_delayed = 0;
-	//int time_tab[20];
 
     while(1){
     	systime_t time;
@@ -133,23 +124,22 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-	//	chprintf((BaseSequentialStream *)&SD3, "ct = %d", chVTGetSystemTime()-time);
+		chprintf((BaseSequentialStream *)&SD3, "ct = %d", chVTGetSystemTime()-time);
 		counter_delayed = counter;
 		if (chVTGetSystemTime()-time <= 59){
 			++counter;
-			//time_tab[counter] = chVTGetSystemTime()-time;
 		}
 		else{
 			counter = 0;
 		}
-//		chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
+		//chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
 		//chprintf((BaseSequentialStream *)&SD3, "cnt= %d", counter);
 		if((counter_delayed != 0)&(counter_delayed <= 8)){
 				if(counter == 0){
 					chprintf((BaseSequentialStream *)&SD3, " dot %c  ", 0);
 				}
 			}
-		// mettre un bool pr desactiver une fois fait one time puis reactiver apres
+		// mettre un bool pr desactiver une fois fait one time puis reactiver apres ?
 		if(counter_delayed == 10){
 			chprintf((BaseSequentialStream *)&SD3, " line %c  ", 0);
 		}
