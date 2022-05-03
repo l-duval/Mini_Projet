@@ -126,7 +126,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 		chBSemSignal(&image_ready_sem);
 		chprintf((BaseSequentialStream *)&SD3, "ct = %d", chVTGetSystemTime()-time);
 		counter_delayed = counter;
-		if (chVTGetSystemTime()-time <= 59){
+		if (chVTGetSystemTime()-time <= 58){
 			++counter;
 		}
 		else{
