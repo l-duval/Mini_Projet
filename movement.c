@@ -7,7 +7,7 @@
 
 #include <gpio.h>
 #include <main.h>
-#include <motors.h>
+#include <motor.h>
 #include <movement.h>
 
 int def_speed (int  speed){
@@ -38,20 +38,16 @@ void rotate (uint8_t direction){
 
 void movement(uint8_t direction, uint8_t goal, int speed){
 
-	def_direction(direction);
+	rotate(direction);
 
 	if (obstacle_detection(goal)){
 		//LED clignotent et le robot n'avance pas
 	}
 	else {
-		//le robot avance
+		//le robot avance mais je ne suis pas du tout sur
 		int MOTOR_SPEED = def_speed(speed);
-		left_motor_set_speed(MOTOR_SPEED);
-		right_motor_set_speed(MOTOR_SPEED);
-		//pas sure du tout car goal uint8_t et non uint32_t
-		left_motor_set_position(goal);
-		right_motor_set_position(goal);
-
+		motor_set_position(goal, goal, MOTOR_SPEED, MOTOR_SPEED);
+		while(motor_position_reached() != POSITION_REACHED); //je ne sais pas quand mettre ca
 	}
 	return ;
 }
@@ -60,6 +56,7 @@ void movement(uint8_t direction, uint8_t goal, int speed){
 bool obstacle_detection(uint8_t goal){
 
 	 bool  obstacle = false;
+
 	 VL53L0X_start();
 	 uint16_t obstacle_dist = VL53L0X_get_dist_mm();
 	 VL53L0X_stop();
