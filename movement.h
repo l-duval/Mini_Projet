@@ -1,12 +1,12 @@
 //define  motors' speeds
 
 #ifndef SPEED_ROTATION	5
-#ifndef LOW_SPEED 		500
-#ifndef HIGH_SPEED  	700
+#ifndef LOW_SPEED 		5
+#ifndef HIGH_SPEED  	10
 
 #define SPEED_ROTATION	5
-#define LOW_SPEED 		500
-#define HIGH_SPEED  	700
+#define LOW_SPEED 		5 // cm/sec
+#define HIGH_SPEED  	10 // cm/sec
 
 
 #endif
