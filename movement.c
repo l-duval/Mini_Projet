@@ -10,7 +10,7 @@
 #include <motor.h>
 #include <movement.h>
 
-int def_speed (int  speed){
+int def_speed (int speed){
 	if (speed){
 		return HIGH_SPEED ;
 	return LOW_SPEED;
@@ -41,7 +41,8 @@ void movement(uint8_t direction, uint8_t goal, int speed){
 	rotate(direction);
 
 	if (obstacle_detection(goal)){
-		//LED clignotent et le robot n'avance pas
+		//LED clignotent et le robot n'avance
+		blinky_led();
 	}
 	else {
 		//le robot avance mais je ne suis pas du tout sur
