@@ -4,17 +4,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stm32f4xx.h>
-#include <gpio.h>
 
+#include <gpio.h>
 #include <main.h>
 #include <motors.h>
+#include <movement.h>
 
-//define speed motor
-#define SPEED_ROTATION	5
-#define LOW_SPEED 		500
-#define HIGH_SPEED  	700
-
-//define motor speed movement in function of the results of the camera
 int def_speed (int  speed){
 	if (speed){
 		return HIGH_SPEED ;
@@ -22,8 +17,7 @@ int def_speed (int  speed){
 	}
 }
 
-//define the direction in function of the results of the camera
-void def_direction (uint8_t direction){
+void rotate (uint8_t direction){
 
 	switch (direction) {
 	//go forward
@@ -42,7 +36,6 @@ void def_direction (uint8_t direction){
 	}
 }
 
-//le robot avance dans la bonne direction à la bonne distance, a la vitesse souhaitée
 void movement(uint8_t direction, uint8_t goal, int speed){
 
 	def_direction(direction);
@@ -64,7 +57,6 @@ void movement(uint8_t direction, uint8_t goal, int speed){
 }
 
 
-//Le robot detecte les obstables avant la distance goal a atteindre
 bool obstacle_detection(uint8_t goal){
 
 	 bool  obstacle = false;
