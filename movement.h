@@ -8,7 +8,10 @@
 #define LOW_SPEED 		5 // cm/sec
 #define HIGH_SPEED  	10 // cm/sec
 
-
+#define PI                  3.1415926536f
+//TO ADJUST IF NECESSARY. NOT ALL THE E-PUCK2 HAVE EXACTLY THE SAME WHEEL DISTANCE
+#define WHEEL_DISTANCE      5.35f    //cm
+#define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
 #endif
 
 /** Define motor speed movement in function of the results of the camera (morse code)
