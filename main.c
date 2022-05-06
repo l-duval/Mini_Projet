@@ -12,8 +12,9 @@
 #include <camera/po8030.h>
 #include <chprintf.h>
 
-#include <pi_regulator.h>
 #include <process_image.h>
+#include <motor_control.h>
+
 
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
@@ -49,13 +50,13 @@ int main(void)
     dcmi_start();
 	po8030_start();
 	//inits the motors
-	//motors_init();
+	motors_init();
 
-	//stars the threads for the pi regulator and the processing of the image
-	//pi_regulator_start();
+	//starts the threads for the motor_control and the processing of the image
 	process_image_start();
-
+	motor_control_start();
     /* Infinite loop. */
+
     while (1) {
     	//waits 1 second
         chThdSleepMilliseconds(1000);
