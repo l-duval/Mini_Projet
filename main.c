@@ -49,13 +49,13 @@ int main(void)
     dcmi_start();
 	po8030_start();
 	//inits the motors
-	//motors_init();
+	motors_init();
 
-	//stars the threads for the pi regulator and the processing of the image
-	//pi_regulator_start();
+	//starts the threads for the pi regulator and the processing of the image
 	process_image_start();
-
+	pi_regulator_start();
     /* Infinite loop. */
+
     while (1) {
     	//waits 1 second
         chThdSleepMilliseconds(1000);
