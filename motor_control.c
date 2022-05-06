@@ -1,3 +1,5 @@
+#include "motor_control.h"
+
 #include "ch.h"
 #include "hal.h"
 #include <math.h>
@@ -7,13 +9,41 @@
 
 #include <main.h>
 #include <motors.h>
-#include <pi_regulator.h>
 #include <process_image.h>
 
 
 
-static THD_WORKING_AREA(waPiRegulator, 256);
-static THD_FUNCTION(PiRegulator, arg) {
+// Def speed
+int def_speed (int speed){
+	if (speed){
+		return HIGH_SPEED ;
+		return LOW_SPEED;
+	}
+}
+
+
+// Rotate function
+void rotate (uint8_t direction){
+
+	switch (direction) {
+	//go forward
+	 case 0: motor_set_position(0, 0, 0, 0);
+	         break;
+	  //turn left (rotation de 90°)
+	 case 1: motor_set_position(PERIMETER_EPUCK/4, PERIMETER_EPUCK/4, SPEED_ROTATION, -SPEED_ROTATION);
+	         break;
+	 //turn right(rotation de 90°)
+	 case 2: motor_set_position(PERIMETER_EPUCK/4, PERIMETER_EPUCK/4, -SPEED_ROTATION, SPEED_ROTATION);
+	         break;
+	 //go backward (rotation de 180°)
+	 case 3:motor_set_position(PERIMETER_EPUCK/2, PERIMETER_EPUCK/2, SPEED_ROTATION, -SPEED_ROTATION);
+	         break;
+	}
+}
+
+
+static THD_WORKING_AREA(wamotor_control, 256);
+static THD_FUNCTION(motor_control, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
@@ -33,6 +63,6 @@ static THD_FUNCTION(PiRegulator, arg) {
     }
 }
 
-void pi_regulator_start(void){
-	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
+void motor_control_start(void){
+	chThdCreateStatic(wamotor_control, sizeof(waPiRegulator), NORMALPRIO, motor_control, NULL);
 }

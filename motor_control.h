@@ -1,7 +1,10 @@
-#ifndef PI_REGULATOR_H
-#define PI_REGULATOR_H
+#ifndef MOTOR_CONTROL_H
+#define MOTOR_CONTROL_H
 
-//start the PI regulator thread
-void pi_regulator_start(void);
+//start the motor_control thread
+void motor_control_start(void);
+void rotate (uint8_t direction);
+int def_speed (int speed);
 
-#endif /* PI_REGULATOR_H */
+
+#endif /* MOTOR_CONTROL_H */
