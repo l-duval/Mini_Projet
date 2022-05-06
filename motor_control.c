@@ -1,12 +1,9 @@
 #include "motor_control.h"
-
 #include "ch.h"
 #include "hal.h"
 #include <math.h>
 #include <usbcfg.h>
 #include <chprintf.h>
-
-
 #include <main.h>
 #include <motors.h>
 #include <process_image.h>
@@ -16,9 +13,9 @@
 // Def speed
 int def_speed (int speed){
 	if (speed){
-		return HIGH_SPEED ;
-		return LOW_SPEED;
+		return HIGH_SPEED;
 	}
+	return LOW_SPEED;
 }
 
 
@@ -49,12 +46,15 @@ static THD_FUNCTION(motor_control, arg) {
     (void)arg;
 
     systime_t time;
+    rotate(morse_logic_direction(char morse_msg[]));
 
-    int16_t speed = 0;
+    int speed = def_speed(morse_logic_speed(char morse_msg[]));
 
     while(1){
         time = chVTGetSystemTime();
         
+
+
 		right_motor_set_speed(speed);
 		left_motor_set_speed(speed);
 
@@ -64,5 +64,5 @@ static THD_FUNCTION(motor_control, arg) {
 }
 
 void motor_control_start(void){
-	chThdCreateStatic(wamotor_control, sizeof(waPiRegulator), NORMALPRIO, motor_control, NULL);
+	chThdCreateStatic(wamotor_control, sizeof(wamotor_control), NORMALPRIO, motor_control, NULL);
 }
