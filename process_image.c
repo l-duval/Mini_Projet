@@ -21,7 +21,8 @@ static THD_FUNCTION(CaptureImage, arg) {
 
 	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 10 + 11 (minimum 2 lines because reasons)
     // Jpeux suppr les deux lignes d'après
-	po8030_advanced_config(FORMAT_RGB565, 0, 10, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
+    //Baisser les pixels
+	po8030_advanced_config(FORMAT_RGB565, 315, 235,10,10, SUBSAMPLING_X1, SUBSAMPLING_X1);
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
@@ -37,7 +38,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-		//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
+		chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 		counter_delayed = counter;
 		if (chVTGetSystemTime()-time <= 58){
 			++counter;
