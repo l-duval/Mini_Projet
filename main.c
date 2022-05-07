@@ -14,7 +14,7 @@
 
 #include <process_image.h>
 #include <motor_control.h>
-
+#include <VL53L0X.h>
 
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
@@ -49,11 +49,13 @@ int main(void)
     //starts the camera
     dcmi_start();
 	po8030_start();
+	VL53L0X_init(VL53L0X_ADDR);
 	//inits the motors
 	motors_init();
 
 	//starts the threads for the motor_control and the processing of the image
 	process_image_start();
+	VL53L0X_start();
 	motor_control_start();
     /* Infinite loop. */
 

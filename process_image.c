@@ -18,14 +18,14 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
 
 // Morse logic avec direction / distance / speed ??? ou les 3 d'un coup ?
-int morse_logic_direction(char morse_msg[]){
+int morse_logic_direction(void){
 
 	// R etant le seul de longeur 3 si le dernier indice de morse en nulle cad qu'on la eu un R.
-	if(morse_msg[20] == '0'){
+	if(morse[20] == '0'){
 		return 2;
 	}
 	// First instruction size 4 except R.
-	char temp[4] = {morse_msg[0], morse_msg[1], morse_msg[2], morse_msg[3]};
+	char temp[4] = {morse[0], morse[1], morse[2], morse[3]};
 	// B for Backwards
 	if(strcmp(temp,"-...") == 0){
 		return 3;
@@ -43,20 +43,20 @@ int morse_logic_direction(char morse_msg[]){
 }
 
 // en cm max 50 cm ?
-int morse_logic_distance(char morse_msg[]){
+int morse_logic_distance(void){
 
 	int i = 0;
 	int dizaine = 0;
 	int unite = 0;
 
 	// Décalage causé par R ? Rapport on aurai pu changer de lettre ou modifier son symbole morse
-	if(morse_msg[20] == '0'){
+	if(morse[20] == '0'){
 		i = -1;
 	}
 	// Dizaine
-	char temp_1[5] = {morse_msg[4+i], morse_msg[5+i],morse_msg[6+i],morse_msg[7+i],morse_msg[8+i]};
+	char temp_1[5] = {morse[4+i], morse[5+i],morse[6+i],morse[7+i],morse[8+i]};
 	// Unite
-	char temp_2[5] = {morse_msg[9+i],morse_msg[10+i],morse_msg[11+i],morse_msg[12+i],morse_msg[13+i]};
+	char temp_2[5] = {morse[9+i],morse[10+i],morse[11+i],morse[12+i],morse[13+i]};
 
 	// Dizaine
 	// Zero
@@ -129,16 +129,16 @@ int morse_logic_distance(char morse_msg[]){
 	return (dizaine*10 + unite);
 }
 
-int morse_logic_speed(char morse_msg[]){
+int morse_logic_speed(void){
 
 	int i = 0;
 	// Décalage causé par R ? Rapport on aurai pu changer de lettre ou modifier son symbole morse
-	if(morse_msg[20] == '0'){
+	if(morse[20] == '0'){
 		i = -1;
 	}
 
-	char temp[7] = {morse_msg[14+i],morse_msg[15+i],morse_msg[16+i],morse_msg[17+i],
-					morse_msg[18+i],morse_msg[19+i],morse_msg[20+i]};
+	char temp[7] = {morse[14+i],morse[15+i],morse[16+i],morse[17+i],
+					morse[18+i],morse[19+i],morse[20+i]};
 	// H for High speed
 	if(strcmp(temp,"....") == 0){
 		return 1;

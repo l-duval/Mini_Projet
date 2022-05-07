@@ -6,6 +6,7 @@
 #include <chprintf.h>
 #include <main.h>
 #include <motors.h>
+#include <VL53L0X.h>
 #include <process_image.h>
 
 
@@ -20,22 +21,33 @@ int def_speed (int speed){
 
 
 // Rotate function
-void rotate (uint8_t direction){
+void rotate (int direction){
 
 	switch (direction) {
 	//go forward
-	 case 0: motor_set_position(0, 0, 0, 0);
+	 case 0: left_motor_set_pos(-500);
+	 	 	 right_motor_set_pos(500);
 	         break;
 	  //turn left (rotation de 90°)
-	 case 1: motor_set_position(PERIMETER_EPUCK/4, PERIMETER_EPUCK/4, SPEED_ROTATION, -SPEED_ROTATION);
+	 case 1:left_motor_set_pos(-500);
+	 	 	right_motor_set_pos(500);
 	         break;
 	 //turn right(rotation de 90°)
-	 case 2: motor_set_position(PERIMETER_EPUCK/4, PERIMETER_EPUCK/4, -SPEED_ROTATION, SPEED_ROTATION);
+	 case 2: left_motor_set_pos(-500);
+	 	 	 right_motor_set_pos(500);
 	         break;
 	 //go backward (rotation de 180°)
-	 case 3:motor_set_position(PERIMETER_EPUCK/2, PERIMETER_EPUCK/2, SPEED_ROTATION, -SPEED_ROTATION);
+	 case 3:left_motor_set_pos(-500);
+	 	 	right_motor_set_pos(500);
 	         break;
 	}
+}
+
+
+void obstacle(int distance){
+
+
+
 }
 
 
@@ -46,17 +58,18 @@ static THD_FUNCTION(motor_control, arg) {
     (void)arg;
 
     systime_t time;
-    rotate(morse_logic_direction(char morse_msg[]));
+    rotate(morse_logic_direction());
 
-    int speed = def_speed(morse_logic_speed(char morse_msg[]));
+    int speed = 0;
+    speed = def_speed(morse_logic_speed());
 
     while(1){
         time = chVTGetSystemTime();
         
 
 
-		right_motor_set_speed(speed);
-		left_motor_set_speed(speed);
+	//	right_motor_set_speed(speed);
+	//	left_motor_set_speed(speed);
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
