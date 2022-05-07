@@ -6,8 +6,16 @@
 #include <chprintf.h>
 #include <main.h>
 #include <motors.h>
+#include <messagebus.h>
 #include <VL53L0X.h>
 #include <process_image.h>
+
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
+
+
 
 
 
@@ -45,9 +53,6 @@ void rotate (int direction){
 
 
 void obstacle(int distance){
-
-
-
 }
 
 
@@ -56,6 +61,13 @@ static THD_FUNCTION(motor_control, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
+
+
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
+
+
+    messagebus_topic_t *morse_topic = messagebus_find_topic_blocking(&bus, "/morse");
+
 
     systime_t time;
     rotate(morse_logic_direction());
@@ -66,6 +78,7 @@ static THD_FUNCTION(motor_control, arg) {
     while(1){
         time = chVTGetSystemTime();
         
+    //	ChVTPrintf ...
 
 
 	//	right_motor_set_speed(speed);

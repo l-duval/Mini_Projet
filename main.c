@@ -16,6 +16,8 @@
 #include <motor_control.h>
 #include <VL53L0X.h>
 
+
+// a suppr + tard ???
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);

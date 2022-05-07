@@ -6,15 +6,23 @@
 #include <stdbool.h>
 #include <main.h>
 #include <string.h>
+#include <messagebus.h>
 #include <camera/po8030.h>
 
 #include <process_image.h>
 
 
+extern messagebus_t bus;
+
 static char morse[21] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-//semaphore
-static BSEMAPHORE_DECL(image_ready_sem, TRUE);
+static thread_t *morseThd;
+
+static bool morse_configured = false;
+
+
+
+
 
 
 // Morse logic avec direction / distance / speed ??? ou les 3 d'un coup ?
@@ -151,24 +159,31 @@ int morse_logic_speed(void){
 	return 0;
 }
 
-
+// Thread qui traite les datas des flashs
 static THD_WORKING_AREA(waCaptureImage, 256 );
 static THD_FUNCTION(CaptureImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 10 + 11 (minimum 2 lines because reasons)
-    // Jpeux suppr les deux lignes d'après
-    //Baisser les pixels
 	po8030_advanced_config(FORMAT_RGB565, 315, 235,10,10, SUBSAMPLING_X1, SUBSAMPLING_X1);
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
+
+
+	 // Declares the topic on the bus.
+	messagebus_topic_t morse_topic;
+	MUTEX_DECL(morse_topic_lock);
+	CONDVAR_DECL(morse_topic_condvar);
+	messagebus_topic_init(&morse_topic, &morse_topic_lock, &morse_topic_condvar, &morse, sizeof(morse));
+	messagebus_advertise_topic(&bus, &morse_topic, "/morse");
+
+
 	int counter = 0;
 	int counter_delayed = 0;
 	int index = 0;
-	memset(morse, 0, 21);
+	// memset(morse, 0, 21);
 	// calculer le max des 3 instructions a la suite + des 0 qui les separes
 	// Check pour R qui meme si y a que y a rien en direction[3] ca marche le switch
 
@@ -185,7 +200,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 		//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 		counter_delayed = counter;
 		// Justifier Threshold
-		if (chVTGetSystemTime()-time <= 58){
+		if (chVTGetSystemTime()-time <= threshold){
 			++counter;
 		}
 		else{
@@ -213,6 +228,23 @@ static THD_FUNCTION(CaptureImage, arg) {
 }
 
 
+
+// Thread receiver qui quand a toutes les datas les envoies a motor.
+static THD_WORKING_AREA(waReceptionData, 256);
+static THD_FUNCTION(ReceptionData, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+
+    while(1){
+
+    }
+}
+
+
+
 void process_image_start(void){
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+	chThdCreateStatic(waReceptionData, sizeof(waReceptionData), NORMALPRIO, ReceptionData, NULL);
 }
