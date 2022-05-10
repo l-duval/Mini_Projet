@@ -6,18 +6,9 @@
 #include <chprintf.h>
 #include <main.h>
 #include <motors.h>
-#include <messagebus.h>
-#include <VL53L0X.h>
+#include <msgbus/messagebus.h>
+#include <sensors/VL53L0X/VL53L0X.h>
 #include <process_image.h>
-
-
-messagebus_t bus;
-MUTEX_DECL(bus_lock);
-CONDVAR_DECL(bus_condvar);
-
-
-
-
 
 // Def speed
 int def_speed (int speed){
@@ -26,7 +17,6 @@ int def_speed (int speed){
 	}
 	return LOW_SPEED;
 }
-
 
 // Rotate function
 void rotate (int direction){
@@ -51,7 +41,6 @@ void rotate (int direction){
 	}
 }
 
-
 void obstacle(int distance){
 }
 
@@ -62,27 +51,33 @@ static THD_FUNCTION(motor_control, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-
-    messagebus_init(&bus, &bus_lock, &bus_condvar);
-
-
     messagebus_topic_t *morse_topic = messagebus_find_topic_blocking(&bus, "/morse");
-
-
     systime_t time;
-    rotate(morse_logic_direction());
+    char morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+   // rotate(morse_logic_direction());
 
     int speed = 0;
-    speed = def_speed(morse_logic_speed());
+  //  speed = def_speed(morse_logic_speed());
 
     while(1){
         time = chVTGetSystemTime();
         
-    //	ChVTPrintf ...
+        // Wait for publish
+        //wait for new measures to be published
+        messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
+        chprintf((BaseSequentialStream *)&SD3, " motor gooo %c  ", morse[1]);
+        // Reset morse instruction after use
+        memset(morse,0,sizeof morse);
+
+        // Wait if not complete
+        //	ChVTPrintf ...
+
+        //	right_motor_set_speed(speed);
+        //	left_motor_set_speed(speed);
 
 
-	//	right_motor_set_speed(speed);
-	//	left_motor_set_speed(speed);
+        // reset message ??
+
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));

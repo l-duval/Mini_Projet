@@ -10,12 +10,16 @@
 #include <main.h>
 #include <motors.h>
 #include <camera/po8030.h>
+#include <msgbus/messagebus.h>
 #include <chprintf.h>
-
+#include <sensors/VL53L0X/VL53L0X.h>
 #include <process_image.h>
 #include <motor_control.h>
-#include <VL53L0X.h>
 
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
 
 // a suppr + tard ???
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
@@ -40,6 +44,7 @@ static void serial_start(void)
 int main(void)
 {
 
+
     halInit();
     chSysInit();
     mpu_init();
@@ -51,12 +56,14 @@ int main(void)
     //starts the camera
     dcmi_start();
 	po8030_start();
-	VL53L0X_init(VL53L0X_ADDR);
 	//inits the motors
 	motors_init();
 
+	messagebus_init(&bus, &bus_lock, &bus_condvar);
 	//starts the threads for the motor_control and the processing of the image
 	process_image_start();
+	// Toujours nécessaire ?
+	chThdSleepMilliseconds(1000);
 	VL53L0X_start();
 	motor_control_start();
     /* Infinite loop. */
