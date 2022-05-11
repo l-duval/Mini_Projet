@@ -18,25 +18,33 @@ static char morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 // Morse logic avec direction / distance / speed ??? ou les 3 d'un coup ?
 int morse_logic_direction(char morse_msg[]){
 
-	// R etant le seul de longeur 3 si le dernier indice de morse en nulle cad qu'on la eu un R.
-	if(morse_msg[17] == '0'){
-		return 2;
-	}
+
 	// First instruction size 4 except R.
+	// Changed the i that did -1
+
+
 	char temp[4] = {morse_msg[0], morse_msg[1], morse_msg[2], morse_msg[3]};
 	// B for Backwards
-	if(strcmp(temp,"-...") == 0){
+	if(strcmp(temp,"1000") == 0){
 		return 3;
 	}
+	// R for Right changed it
+	if(strcmp(temp,"0001") == 0){
+		return 2;
+	}
 	// F for forward
-	else if(strcmp(temp,"..-.") == 0){
+	else if(strcmp(temp,"0010") == 0){
+		chprintf((BaseSequentialStream *)&SD3, "go forward process image %c ", 0);
 		return 0;
+
 	}
 	// L for Left
-	else if(strcmp(temp,".-..") == 0){
+	// Pourquoi ca c'est pas lancé ?
+	else if(strcmp(temp,"0100") == 0){
 		return 1;
 	}
 	// If error stays forward
+	chprintf((BaseSequentialStream *)&SD3, "return de base %c ", 0);
 	return 0;
 }
 
@@ -48,79 +56,80 @@ int morse_logic_distance(char morse_msg[]){
 	int unite = 0;
 
 	// Décalage causé par R ? Rapport on aurai pu changer de lettre ou modifier son symbole morse
-	if(morse_msg[17] == '0'){
-		i = -1;
-	}
+	//if(morse_msg[17] == '0'){
+	//	i = -1;
+	//}
+
 	// Dizaine
-	char temp_1[5] = {morse_msg[4+i], morse_msg[5+i],morse_msg[6+i],morse_msg[7+i],morse_msg[8+i]};
+	char temp_1[5] = {morse_msg[4], morse_msg[5],morse_msg[6],morse_msg[7],morse_msg[8]};
 	// Unite
-	char temp_2[5] = {morse_msg[9+i],morse_msg[10+i],morse_msg[11+i],morse_msg[12+i],morse_msg[13+i]};
+	char temp_2[5] = {morse_msg[9],morse_msg[10],morse_msg[11],morse_msg[12],morse_msg[13]};
 
 	// Dizaine
 	// Zero
-	if(strcmp(temp_1,"-----") == 0){
+	if(strcmp(temp_1,"11111") == 0){
 		dizaine = 0;
 	}
 	// Un
-	else if(strcmp(temp_1,".----") == 0){
+	else if(strcmp(temp_1,"01111") == 0){
 		dizaine = 1;
 	}
 	// Deux
-	else if(strcmp(temp_1,"..---") == 0){
+	else if(strcmp(temp_1,"00111") == 0){
 		dizaine = 2;
 	}
 	// Trois
-	else if(strcmp(temp_1,"...--") == 0){
+	else if(strcmp(temp_1,"00011") == 0){
 		dizaine = 3;
 	}
 	// Quatre
-	else if(strcmp(temp_1,"....-") == 0){
+	else if(strcmp(temp_1,"00001") == 0){
 		dizaine = 4;
 	}
 	// Cinq
-	else if(strcmp(temp_1,".....") == 0){
+	else if(strcmp(temp_1,"00000") == 0){
 		dizaine = 5;
 	}
 
 	// Unite
 	// Zero
-		if(strcmp(temp_2,"-----") == 0){
+		if(strcmp(temp_2,"11111") == 0){
 			unite = 0;
 		}
 		// Un
-		else if(strcmp(temp_2,".----") == 0){
+		else if(strcmp(temp_2,"01111") == 0){
 			unite = 1;
 		}
 		// Deux
-		else if(strcmp(temp_2,"..---") == 0){
+		else if(strcmp(temp_2,"00111") == 0){
 			unite = 2;
 		}
 		// Trois
-		else if(strcmp(temp_2,"...--") == 0){
+		else if(strcmp(temp_2,"00011") == 0){
 			unite = 3;
 		}
 		// Quatre
-		else if(strcmp(temp_2,"....-") == 0){
+		else if(strcmp(temp_2,"00001") == 0){
 			unite = 4;
 		}
 		// Cinq
-		else if(strcmp(temp_2,".....") == 0){
+		else if(strcmp(temp_2,"00000") == 0){
 			unite = 5;
 		}
 		// Six
-		else if(strcmp(temp_2,"-....") == 0){
+		else if(strcmp(temp_2,"10000") == 0){
 			unite  = 6;
 		}
 		// Sept
-		else if(strcmp(temp_2,"--...") == 0){
+		else if(strcmp(temp_2,"11000") == 0){
 			unite = 7;
 		}
 		// Huit
-		else if(strcmp(temp_2,"---..") == 0){
+		else if(strcmp(temp_2,"11100") == 0){
 			unite = 8;
 		}
 		// Neuf
-		else if(strcmp(temp_2,"----.") == 0){
+		else if(strcmp(temp_2,"11110") == 0){
 			unite = 9;
 		}
 
@@ -129,19 +138,19 @@ int morse_logic_distance(char morse_msg[]){
 
 int morse_logic_speed(char morse_msg[]){
 
-	int i = 0;
+	// int i = 0;
 	// Décalage causé par R ? Rapport on aurai pu changer de lettre ou modifier son symbole morse
-	if(morse_msg[17] == '0'){
-		i = -1;
-	}
+	//if(morse_msg[17] == '0'){
+	//	i = -1;
+	//}
 
-	char temp[7] = {morse_msg[14+i],morse_msg[15+i],morse_msg[16+i],morse_msg[17+i]};
+	char temp[7] = {morse_msg[14],morse_msg[15],morse_msg[16],morse_msg[17]};
 	// H for High speed
-	if(strcmp(temp,"....") == 0){
+	if(strcmp(temp,"0000") == 0){
 		return 1;
 	}
 	// L for Low Speed
-	else if(strcmp(temp,".-..") == 0){
+	else if(strcmp(temp,"0100") == 0){
 		return 0;
 	}
 	// If error low speed
@@ -159,7 +168,6 @@ static THD_FUNCTION(CaptureImage, arg) {
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
-
 
 	 // Declares the topic on the bus.
 	messagebus_topic_t morse_topic;
@@ -185,7 +193,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
-		//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
+		chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 		counter_delayed = counter;
 		// Justifier Threshold
 		if (chVTGetSystemTime()-time <= threshold){
@@ -197,10 +205,10 @@ static THD_FUNCTION(CaptureImage, arg) {
 		//chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
 		//chprintf((BaseSequentialStream *)&SD3, "cnt= %d", counter);
 		// && ou &
-		if((counter_delayed != 0)&&(counter_delayed <= 8)){
+		if((counter_delayed != 0)&&(counter_delayed <= 6)){
 				if(counter == 0){
 					chprintf((BaseSequentialStream *)&SD3, " dot %c  ", 0);
-					morse[index] = '.';
+					morse[index] = '0';
 					++index;
 				}
 			}
@@ -208,7 +216,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 		if(counter_delayed >= 10){
 			if(counter == 0){
 			chprintf((BaseSequentialStream *)&SD3, " line %c  ", 0);
-			morse[index] = '-';
+			morse[index] = '1';
 			++index;
 			}
 		}
@@ -216,7 +224,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 			messagebus_topic_publish(&morse_topic, &morse, sizeof(morse));
 			index = 0;
 			// Reset morse instruction after use
-			memset(morse,0,sizeof morse);
+			// Sort que des 0 ???
 		}
     }
 }

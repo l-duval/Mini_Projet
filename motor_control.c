@@ -10,6 +10,14 @@
 #include <sensors/VL53L0X/VL53L0X.h>
 #include <process_image.h>
 
+
+
+static int16_t position_to_reach_right = 0; // in [step]
+static int16_t position_to_reach_left = 0; // in [step]
+static uint8_t position_right_reached = 0; // in [step]
+static uint8_t position_left_reached = 0; // in [step]
+
+
 // Def speed
 int def_speed (int speed){
 	if (speed){
@@ -22,27 +30,31 @@ int def_speed (int speed){
 void rotate (int direction){
 
 	switch (direction) {
-	//go forward
-	 case 0: left_motor_set_pos(-500);
-	 	 	 right_motor_set_pos(500);
+	//go forward valeur test ca devrait etre (0)
+	 case 0:
+		 	 chprintf((BaseSequentialStream *)&SD3, "go forward %c ", 0);
+		 	 right_motor_set_speed(0);
+	 	 	 left_motor_set_speed(0);
 	         break;
 	  //turn left (rotation de 90°)
-	 case 1:left_motor_set_pos(-500);
-	 	 	right_motor_set_pos(500);
+	 case 1: chprintf((BaseSequentialStream *)&SD3, "go left %c ", 0);
+	 	 	 right_motor_set_speed(-200);
+	 	 	 left_motor_set_speed(200);
 	         break;
 	 //turn right(rotation de 90°)
-	 case 2: left_motor_set_pos(-500);
-	 	 	 right_motor_set_pos(500);
+	 case 2: chprintf((BaseSequentialStream *)&SD3, "go right %c ", 0);
+		 	 right_motor_set_speed(200);
+	 	 	 left_motor_set_speed(-200);
 	         break;
-	 //go backward (rotation de 180°)
-	 case 3:left_motor_set_pos(-500);
-	 	 	right_motor_set_pos(500);
+	 //go backward (rotation de 180°) comme right or left mais + long
+	 case 3: chprintf((BaseSequentialStream *)&SD3, "go backwards %c ", 0);
+		 	 right_motor_set_speed(200);
+	 	 	 left_motor_set_speed(-200);
 	         break;
 	}
 }
 
-void obstacle(int distance){
-}
+
 
 
 static THD_WORKING_AREA(wamotor_control, 256);
@@ -63,11 +75,31 @@ static THD_FUNCTION(motor_control, arg) {
         time = chVTGetSystemTime();
         
         // Wait for publish
-        //wait for new measures to be published
         messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
-        chprintf((BaseSequentialStream *)&SD3, " motor gooo %c  ", morse[1]);
+        // pourquoi vide ?? psk memset dans process image
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[0]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[1]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[2]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[3]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[4]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[5]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[6]);
+		chprintf((BaseSequentialStream *)&SD3, "%c", morse[7]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[8]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[9]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[10]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[11]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[12]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[13]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[14]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[15]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[16]);
+        chprintf((BaseSequentialStream *)&SD3, "%c", morse[17]);
+
+
+        rotate(morse_logic_direction(morse));
         // Reset morse instruction after use
-        memset(morse,0,sizeof morse);
+       // memset(morse,0,sizeof morse);
 
         // Wait if not complete
         //	ChVTPrintf ...

@@ -62,7 +62,7 @@ int main(void)
 	messagebus_init(&bus, &bus_lock, &bus_condvar);
 	//starts the threads for the motor_control and the processing of the image
 	process_image_start();
-	// Toujours nécessaire ?
+	// wait for init in process image
 	chThdSleepMilliseconds(1000);
 	VL53L0X_start();
 	motor_control_start();
