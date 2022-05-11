@@ -12,10 +12,10 @@
 
 
 
-static int16_t position_to_reach_right = 0; // in [step]
-static int16_t position_to_reach_left = 0; // in [step]
-static uint8_t position_right_reached = 0; // in [step]
-static uint8_t position_left_reached = 0; // in [step]
+//static int16_t position_to_reach_right = 0; // in [step]
+//static int16_t position_to_reach_left = 0; // in [step]
+//static uint8_t position_right_reached = 0; // in [step]
+//static uint8_t position_left_reached = 0; // in [step]
 
 
 // Def speed
@@ -55,8 +55,6 @@ void rotate (int direction){
 }
 
 
-
-
 static THD_WORKING_AREA(wamotor_control, 256);
 static THD_FUNCTION(motor_control, arg) {
 
@@ -65,10 +63,10 @@ static THD_FUNCTION(motor_control, arg) {
 
     messagebus_topic_t *morse_topic = messagebus_find_topic_blocking(&bus, "/morse");
     systime_t time;
-    char morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
    // rotate(morse_logic_direction());
 
-    int speed = 0;
+   // int speed = 0;
   //  speed = def_speed(morse_logic_speed());
 
     while(1){
@@ -77,25 +75,24 @@ static THD_FUNCTION(motor_control, arg) {
         // Wait for publish
         messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
         // pourquoi vide ?? psk memset dans process image
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[0]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[1]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[2]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[3]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[4]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[5]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[6]);
-		chprintf((BaseSequentialStream *)&SD3, "%c", morse[7]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[8]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[9]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[10]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[11]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[12]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[13]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[14]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[15]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[16]);
-        chprintf((BaseSequentialStream *)&SD3, "%c", morse[17]);
-
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[0]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[1]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[2]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[3]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[4]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[5]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[6]);
+		chprintf((BaseSequentialStream *)&SD3, "%d", morse[7]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[8]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[9]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[10]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[11]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[12]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[13]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[14]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[15]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[16]);
+        chprintf((BaseSequentialStream *)&SD3, "%d", morse[17]);
 
         rotate(morse_logic_direction(morse));
         // Reset morse instruction after use

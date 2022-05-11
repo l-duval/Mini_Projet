@@ -1,12 +1,15 @@
 #ifndef PROCESS_IMAGE_H
 #define PROCESS_IMAGE_H
 
-#define threshold 58
+#define threshold 50
+#define min_length_dot 4
+#define max_length_dot 18
+#define min_length_line 30
 
 void process_image_start(void);
-int morse_logic_distance(char morse_msg[]);
-int morse_logic_speed(char morse_msg[]);
-int morse_logic_direction(char morse_msg[]);
+int morse_logic_distance(int morse_msg[]);
+int morse_logic_speed(int morse_msg[]);
+int morse_logic_direction(int morse_msg[]);
 
 
 #endif /* PROCESS_IMAGE_H */
