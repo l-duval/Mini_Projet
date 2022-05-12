@@ -173,6 +173,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 	// Check pour R qui meme si y a que y a rien en direction[3] ca marche le switch
 
     while(1){
+    	po8030_set_ae(1);
     	systime_t time;
     	time = chVTGetSystemTime();
     	 //starts a capture
@@ -209,8 +210,9 @@ static THD_FUNCTION(CaptureImage, arg) {
 			}
 		}
 		if(index == 18){
-			messagebus_topic_publish(&morse_topic, &morse, sizeof(morse));
+			po8030_set_exposure(2048,0);
 			index = 0;
+			messagebus_topic_publish(&morse_topic, &morse, sizeof(morse));
 			// Reset morse instruction after use
 			// Sort que des 0 ???
 		}

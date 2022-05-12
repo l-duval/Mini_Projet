@@ -11,11 +11,7 @@
 #include <process_image.h>
 
 
-
-//static int16_t position_to_reach_right = 0; // in [step]
-//static int16_t position_to_reach_left = 0; // in [step]
-//static uint8_t position_right_reached = 0; // in [step]
-//static uint8_t position_left_reached = 0; // in [step]
+// Enlever Motor.h ??
 
 
 // Def speed
@@ -38,24 +34,33 @@ void rotate (int direction){
 	         break;
 	  //turn left (rotation de 90°)
 	 case 1: chprintf((BaseSequentialStream *)&SD3, "go left %c ", 0);
-	 	 	 right_motor_set_speed(-200);
-	 	 	 left_motor_set_speed(200);
+	 	 	 right_motor_set_speed(200);
+	 	 	 left_motor_set_speed(-200);
+	 	 	 chThdSleepMilliseconds(2000);
+	 	 	 right_motor_set_speed(0);
+	 	     left_motor_set_speed(0);
 	         break;
 	 //turn right(rotation de 90°)
 	 case 2: chprintf((BaseSequentialStream *)&SD3, "go right %c ", 0);
-		 	 right_motor_set_speed(200);
-	 	 	 left_motor_set_speed(-200);
+	 	 	 right_motor_set_speed(-200);
+	 	 	 left_motor_set_speed(200);
+	 	 	 chThdSleepMilliseconds(2000);
+	 	 	 right_motor_set_speed(0);
+	 	     left_motor_set_speed(0);
 	         break;
 	 //go backward (rotation de 180°) comme right or left mais + long
 	 case 3: chprintf((BaseSequentialStream *)&SD3, "go backwards %c ", 0);
-		 	 right_motor_set_speed(200);
-	 	 	 left_motor_set_speed(-200);
+	 	 	 right_motor_set_speed(-200);
+	 	 	 left_motor_set_speed(200);
+	 	 	 chThdSleepMilliseconds(4000);
+	 	 	 right_motor_set_speed(0);
+	 	 	 left_motor_set_speed(0);
 	         break;
 	}
 }
 
-
-static THD_WORKING_AREA(wamotor_control, 256);
+// Remettre a 256 ??
+static THD_WORKING_AREA(wamotor_control, 512);
 static THD_FUNCTION(motor_control, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -74,7 +79,6 @@ static THD_FUNCTION(motor_control, arg) {
         
         // Wait for publish
         messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
-        // pourquoi vide ?? psk memset dans process image
         chprintf((BaseSequentialStream *)&SD3, "%d", morse[0]);
         chprintf((BaseSequentialStream *)&SD3, "%d", morse[1]);
         chprintf((BaseSequentialStream *)&SD3, "%d", morse[2]);
@@ -103,10 +107,7 @@ static THD_FUNCTION(motor_control, arg) {
 
         //	right_motor_set_speed(speed);
         //	left_motor_set_speed(speed);
-
-
         // reset message ??
-
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
