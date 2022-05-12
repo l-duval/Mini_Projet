@@ -9,6 +9,7 @@
 #include <msgbus/messagebus.h>
 #include <camera/po8030.h>
 #include <process_image.h>
+#include <selector.h>
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -168,55 +169,71 @@ static THD_FUNCTION(CaptureImage, arg) {
 	int counter = 0;
 	int counter_delayed = 0;
 	int index = 0;
+	int selector_actual = 0;
+	int selector_previous = 0;
+	selector_previous = get_selector();
+	//selector_actual = get_selector();
+	bool ready_to_send = false;
+
+	chprintf((BaseSequentialStream *)&SD3, "selector %d", selector_actual);
 	// memset(morse, 0, 21);
 	// calculer le max des 3 instructions a la suite + des 0 qui les separes
 	// Check pour R qui meme si y a que y a rien en direction[3] ca marche le switch
 
-    while(1){
-    	po8030_set_ae(1);
-    	systime_t time;
-    	time = chVTGetSystemTime();
-    	 //starts a capture
-		dcmi_capture_start();
-		//waits for the capture to be done
-		wait_image_ready();
-		//signals an image has been captured
-		chBSemSignal(&image_ready_sem);
-		chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
-		counter_delayed = counter;
-		// Justifier Threshold
-		if (chVTGetSystemTime()-time <= threshold){
-			++counter;
-		}
-		else{
-			counter = 0;
-		}
-		//chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
-		//chprintf((BaseSequentialStream *)&SD3, "cnt= %d", counter);
-		// && ou &
-		if((counter_delayed > min_length_dot)&&(counter_delayed <= max_length_dot)){
+	while(1){
+		selector_actual = get_selector();
+		if((selector_actual != selector_previous)&&(ready_to_send)){
+			po8030_set_ae(ae_on);
+			systime_t time;
+			time = chVTGetSystemTime();
+			 //starts a capture
+			dcmi_capture_start();
+			//waits for the capture to be done
+			wait_image_ready();
+			//signals an image has been captured
+			chBSemSignal(&image_ready_sem);
+			// Pour virer startup wait ici tres peu longtemps?
+			//chThdSleepMilliseconds(500);
+
+			chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
+			counter_delayed = counter;
+			// Justifier Threshold
+			if (chVTGetSystemTime()-time <= threshold){
+				++counter;
+			}
+			else{
+				counter = 0;
+			}
+			//chprintf((BaseSequentialStream *)&SD3, "capture time 2 = %d\n", chVTGetSystemTime()-time);
+			//chprintf((BaseSequentialStream *)&SD3, "cnt= %d", counter);
+			// && ou &
+			if((counter_delayed > min_length_dot)&&(counter_delayed <= max_length_dot)){
 				if(counter == 0){
 					chprintf((BaseSequentialStream *)&SD3, " dot %c  ", 0);
 					morse[index] = 0;
 					++index;
 				}
 			}
-		// mettre un bool pr desactiver une fois fait one time puis reactiver apres ?
-		if(counter_delayed >= min_length_line){
-			if(counter == 0){
-			chprintf((BaseSequentialStream *)&SD3, " line %c  ", 0);
-			morse[index] = 1;
-			++index;
+			// mettre un bool pr desactiver une fois fait one time puis reactiver apres ?
+			if(counter_delayed >= min_length_line){
+				if(counter == 0){
+				chprintf((BaseSequentialStream *)&SD3, " line %c  ", 0);
+				morse[index] = 1;
+				++index;
+				}
+			}
+			if(index == 18){
+				selector_previous = selector_actual;
+				// pas nécessaire je crois puisque le selector bloque tout
+				po8030_set_exposure(2048,0);
+				index = 0;
+				messagebus_topic_publish(&morse_topic, &morse, sizeof(morse));
+				// Reset morse instruction after use
+				// Sort que des 0 ???
 			}
 		}
-		if(index == 18){
-			po8030_set_exposure(2048,0);
-			index = 0;
-			messagebus_topic_publish(&morse_topic, &morse, sizeof(morse));
-			// Reset morse instruction after use
-			// Sort que des 0 ???
-		}
-    }
+		ready_to_send = true;
+	}
 }
 
 void process_image_start(void){

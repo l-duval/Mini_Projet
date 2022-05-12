@@ -36,7 +36,7 @@ void rotate (int direction){
 	 case 1: chprintf((BaseSequentialStream *)&SD3, "go left %c ", 0);
 	 	 	 right_motor_set_speed(200);
 	 	 	 left_motor_set_speed(-200);
-	 	 	 chThdSleepMilliseconds(2000);
+	 	 	 chThdSleepMilliseconds(1700);
 	 	 	 right_motor_set_speed(0);
 	 	     left_motor_set_speed(0);
 	         break;
@@ -44,7 +44,7 @@ void rotate (int direction){
 	 case 2: chprintf((BaseSequentialStream *)&SD3, "go right %c ", 0);
 	 	 	 right_motor_set_speed(-200);
 	 	 	 left_motor_set_speed(200);
-	 	 	 chThdSleepMilliseconds(2000);
+	 	 	 chThdSleepMilliseconds(1700);
 	 	 	 right_motor_set_speed(0);
 	 	     left_motor_set_speed(0);
 	         break;
@@ -52,7 +52,7 @@ void rotate (int direction){
 	 case 3: chprintf((BaseSequentialStream *)&SD3, "go backwards %c ", 0);
 	 	 	 right_motor_set_speed(-200);
 	 	 	 left_motor_set_speed(200);
-	 	 	 chThdSleepMilliseconds(4000);
+	 	 	 chThdSleepMilliseconds(3400);
 	 	 	 right_motor_set_speed(0);
 	 	 	 left_motor_set_speed(0);
 	         break;
@@ -73,7 +73,6 @@ static THD_FUNCTION(motor_control, arg) {
 
    // int speed = 0;
   //  speed = def_speed(morse_logic_speed());
-
     while(1){
         time = chVTGetSystemTime();
         
@@ -109,7 +108,9 @@ static THD_FUNCTION(motor_control, arg) {
         //	left_motor_set_speed(speed);
         // reset message ??
 
+
         //100Hz
+
         chThdSleepUntilWindowed(time, time + MS2ST(10));
     }
 }
