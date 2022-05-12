@@ -19,11 +19,6 @@ static int morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 // Morse logic avec direction / distance / speed ??? ou les 3 d'un coup ?
 int morse_logic_direction(int morse_msg[]){
 
-	 chprintf((BaseSequentialStream *)&SD3, "direction loaded %c ", 0);
-	 chprintf((BaseSequentialStream *)&SD3, "%d", morse_msg[0]);
-	 chprintf((BaseSequentialStream *)&SD3, "%d", morse_msg[1]);
-	 chprintf((BaseSequentialStream *)&SD3, "%d", morse_msg[2]);
-	 chprintf((BaseSequentialStream *)&SD3, "%d", morse_msg[3]);
 	// B for Backwards "1000"
 	if((morse[0]==1)&&(morse[1]==0)&&(morse[2]==0)&&(morse[3]==0)){
 		return 3;
@@ -80,43 +75,43 @@ int morse_logic_distance(int morse_msg[]){
 
 	// Unite
 	// Zero "11111"
-	if((morse_msg[4]==1)&&(morse_msg[5]==1)&&(morse_msg[6]==1)&&(morse_msg[7]==1)&&(morse_msg[8]==1)){
+	if((morse_msg[9]==1)&&(morse_msg[10]==1)&&(morse_msg[11]==1)&&(morse_msg[12]==1)&&(morse_msg[13]==1)){
 		unite = 0;
 	}
 	// Un "01111"
-	if((morse_msg[4]==0)&&(morse_msg[5]==1)&&(morse_msg[6]==1)&&(morse_msg[7]==1)&&(morse_msg[8]==1)){
+	if((morse_msg[9]==0)&&(morse_msg[10]==1)&&(morse_msg[11]==1)&&(morse_msg[12]==1)&&(morse_msg[13]==1)){
 		unite = 1;
 	}
 	// Deux "00111"
-	if((morse_msg[4]==0)&&(morse_msg[5]==0)&&(morse_msg[6]==1)&&(morse_msg[7]==1)&&(morse_msg[8]==1)){
+	if((morse_msg[9]==0)&&(morse_msg[10]==0)&&(morse_msg[11]==1)&&(morse_msg[12]==1)&&(morse_msg[13]==1)){
 		unite = 2;
 	}
 	// Trois "00011"
-	if((morse_msg[4]==0)&&(morse_msg[5]==0)&&(morse_msg[6]==0)&&(morse_msg[7]==1)&&(morse_msg[8]==1)){
+	if((morse_msg[9]==0)&&(morse_msg[10]==0)&&(morse_msg[11]==0)&&(morse_msg[12]==1)&&(morse_msg[13]==1)){
 		unite = 3;
 	}
 	// Quatre "00001"
-	if((morse_msg[4]==0)&&(morse_msg[5]==0)&&(morse_msg[6]==0)&&(morse_msg[7]==0)&&(morse_msg[8]==1)){
+	if((morse_msg[9]==0)&&(morse_msg[10]==0)&&(morse_msg[11]==0)&&(morse_msg[12]==0)&&(morse_msg[13]==1)){
 		unite = 4;
 	}
 	// Cinq "00000"
-	if((morse_msg[4]==0)&&(morse_msg[5]==0)&&(morse_msg[6]==0)&&(morse_msg[7]==0)&&(morse_msg[8]==0)){
+	if((morse_msg[9]==0)&&(morse_msg[10]==0)&&(morse_msg[11]==0)&&(morse_msg[12]==0)&&(morse_msg[13]==0)){
 		unite = 5;
 	}
 	// Six "10000"
-	if((morse_msg[4]==1)&&(morse_msg[5]==0)&&(morse_msg[6]==0)&&(morse_msg[7]==0)&&(morse_msg[8]==0)){
+	if((morse_msg[9]==1)&&(morse_msg[10]==0)&&(morse_msg[11]==0)&&(morse_msg[12]==0)&&(morse_msg[13]==0)){
 		unite = 6;
 	}
 	// Sept "11000"
-	if((morse_msg[4]==1)&&(morse_msg[5]==1)&&(morse_msg[6]==0)&&(morse_msg[7]==0)&&(morse_msg[8]==0)){
+	if((morse_msg[9]==1)&&(morse_msg[10]==1)&&(morse_msg[11]==0)&&(morse_msg[12]==0)&&(morse_msg[13]==0)){
 		unite = 7;
 	}
 	// Huit "11100"
-	if((morse_msg[4]==1)&&(morse_msg[5]==1)&&(morse_msg[6]==0)&&(morse_msg[7]==0)&&(morse_msg[8]==0)){
+	if((morse_msg[9]==1)&&(morse_msg[10]==1)&&(morse_msg[11]==1)&&(morse_msg[12]==0)&&(morse_msg[13]==0)){
 		unite = 8;
 	}
 	// Neuf "11110"
-	if((morse_msg[4]==1)&&(morse_msg[5]==1)&&(morse_msg[6]==1)&&(morse_msg[7]==1)&&(morse_msg[8]==0)){
+	if((morse_msg[9]==1)&&(morse_msg[10]==1)&&(morse_msg[11]==1)&&(morse_msg[12]==1)&&(morse_msg[13]==0)){
 		unite = 9;
 	}
 
@@ -124,24 +119,16 @@ int morse_logic_distance(int morse_msg[]){
 }
 
 int morse_logic_speed(int morse_msg[]){
-
-	// int i = 0;
-	// Décalage causé par R ? Rapport on aurai pu changer de lettre ou modifier son symbole morse
-	//if(morse_msg[17] == '0'){
-	//	i = -1;
-	//}
-
-	//int temp[7] = {morse_msg[14],morse_msg[15],morse_msg[16],morse_msg[17]};
-	// H for High speed
-	//if(strcmp(temp,"0000") == 0){
-		//return 1;
-	//}
-	// L for Low Speed
-	//else if(strcmp(temp,"0100") == 0){
-		//return 0;
-//	}
-	// If error low speed
-	//return 0;
+	 // H for High speed
+	 if((morse[14]==0)&&(morse[15]==0)&&(morse[16]==0)&&(morse[17]==0)){
+		return 1;
+	}
+	// L for Low Speed "0100"
+	if((morse[14]==0)&&(morse[15]==1)&&(morse[16]==0)&&(morse[17]==0)){
+		return 0;
+	}
+	//If error low speed
+	return 0;
 }
 
 // Thread qui traite les datas des flashs
@@ -195,7 +182,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 			// Pour virer startup wait ici tres peu longtemps?
 			//chThdSleepMilliseconds(500);
 
-			chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
+			//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 			counter_delayed = counter;
 			// Justifier Threshold
 			if (chVTGetSystemTime()-time <= threshold){

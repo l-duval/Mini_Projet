@@ -59,7 +59,27 @@ void rotate (int direction){
 	}
 }
 
-// Remettre a 256 ??
+void movement(int distance, int speed, int morse_msg[]){
+	speed = def_speed(morse_logic_speed(morse_msg));
+	int time_to_dist = 0 ;
+	int tof_distance = 0;
+	tof_distance = (int)VL53L0X_get_dist_mm()*10; // convert to cm
+	if(tof_distance > distance){
+		right_motor_set_speed(speed);
+		left_motor_set_speed(speed);
+		//Bon calcul ??
+		time_to_dist = distance/speed;
+		chThdSleepMilliseconds(time_to_dist);
+	}
+	right_motor_set_speed(0);
+	left_motor_set_speed(0);
+// else led ???
+}
+
+
+
+
+// Remettre a 256 ?? to 1024 ???
 static THD_WORKING_AREA(wamotor_control, 512);
 static THD_FUNCTION(motor_control, arg) {
 
@@ -68,47 +88,37 @@ static THD_FUNCTION(motor_control, arg) {
 
     messagebus_topic_t *morse_topic = messagebus_find_topic_blocking(&bus, "/morse");
     systime_t time;
+    uint16_t distance = 0;
+    uint16_t speed = 0;
     int morse[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-   // rotate(morse_logic_direction());
 
-   // int speed = 0;
-  //  speed = def_speed(morse_logic_speed());
     while(1){
         time = chVTGetSystemTime();
         
         // Wait for publish
         messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[0]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[1]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[2]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[3]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[4]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[5]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[6]);
-		chprintf((BaseSequentialStream *)&SD3, "%d", morse[7]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[8]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[9]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[10]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[11]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[12]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[13]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[14]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[15]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[16]);
-        chprintf((BaseSequentialStream *)&SD3, "%d", morse[17]);
-
         rotate(morse_logic_direction(morse));
-        // Reset morse instruction after use
-       // memset(morse,0,sizeof morse);
-
-        // Wait if not complete
-        //	ChVTPrintf ...
-
-        //	right_motor_set_speed(speed);
-        //	left_motor_set_speed(speed);
-        // reset message ??
-
-
+        chThdSleepMilliseconds(1000);
+        chprintf((BaseSequentialStream *)&SD3, "tof dist %d ", VL53L0X_get_dist_mm());
+        distance = (uint32_t)morse_logic_distance(morse);
+        chprintf((BaseSequentialStream *)&SD3, "morse dist %d ", distance);
+        speed = (uint32_t)def_speed(morse_logic_speed(morse));
+        chprintf((BaseSequentialStream *)&SD3, "morse speed %d ", speed);
+        chprintf((BaseSequentialStream *)&SD3, "dist*10 %d ", 10*distance);
+        if(VL53L0X_get_dist_mm() > (10*distance)){
+        	chprintf((BaseSequentialStream *)&SD3, "obstacle ok %d ",0);
+        	right_motor_set_speed(speed);
+        	left_motor_set_speed(speed);
+        	// essayer de justifier ca
+       		systime_t time_to_dist = NSTEP_ONE_TURN/WHEEL_PERIMETER*1000*distance/speed;
+       		chprintf((BaseSequentialStream *)&SD3, "time to dist %d", time_to_dist);
+        	// sinon plutot boucle avec compteur nbr de step pour dist/perimetre roue*1000 / step/s =
+        	//systime_t time_to_dist = distance/speed;
+       		chThdSleepMilliseconds(time_to_dist);
+        }
+        right_motor_set_speed(0);
+        left_motor_set_speed(0);
+       // movement(morse_logic_distance(morse),morse_logic_speed(morse),morse);
         //100Hz
 
         chThdSleepUntilWindowed(time, time + MS2ST(10));
