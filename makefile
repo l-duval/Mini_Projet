@@ -11,7 +11,7 @@ GLOBAL_PATH = C:\Users\duval\Documents\EPFL\BA6\Robotique\Projet\lib\e-puck2_mai
 #Source files to include
 CSRC += ./main.c \
 		./motor_control.c \
-		./process_image.c \
+		./process_flash.c \
 
 #Header folders to include
 INCDIR +=

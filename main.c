@@ -13,7 +13,7 @@
 #include <msgbus/messagebus.h>
 #include <chprintf.h>
 #include <sensors/VL53L0X/VL53L0X.h>
-#include <process_image.h>
+#include <process_flash.h>
 #include <motor_control.h>
 
 
@@ -61,8 +61,8 @@ int main(void)
 
 	messagebus_init(&bus, &bus_lock, &bus_condvar);
 	//starts the threads for the motor_control and the processing of the image
-	process_image_start();
-	// wait for init in process image
+	process_flash_start();
+	// wait for init in process flash
 	chThdSleepMilliseconds(1000);
 	VL53L0X_start();
 	motor_control_start();
