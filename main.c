@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+
 
 #include "ch.h"
 #include "hal.h"
@@ -21,7 +21,6 @@ messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
 
-// a suppr + tard ???
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
@@ -58,9 +57,9 @@ int main(void)
 	po8030_start();
 	//inits the motors
 	motors_init();
-
+	// init msgbus
 	messagebus_init(&bus, &bus_lock, &bus_condvar);
-	//starts the threads for the motor_control and the processing of the image
+	//starts the threads for the motor_control and the processing of the flashs
 	process_flash_start();
 	// wait for init in process flash
 	chThdSleepMilliseconds(1000);
