@@ -43,26 +43,26 @@ static void serial_start(void)
 int main(void)
 {
 
-
     halInit();
     chSysInit();
     mpu_init();
 
     //starts the serial communication
     serial_start();
-    //start the USB communication
+    //starts the USB communication
     usb_start();
     //starts the camera
     dcmi_start();
 	po8030_start();
 	//inits the motors
 	motors_init();
-	// init msgbus
+	// inits messasge bus
 	messagebus_init(&bus, &bus_lock, &bus_condvar);
 	//starts the threads for the motor_control and the processing of the flashs
 	process_flash_start();
-	// wait for init in process flash
+	// wait 1 second for init in process flash
 	chThdSleepMilliseconds(1000);
+	//starts the TOF
 	VL53L0X_start();
 	motor_control_start();
     /* Infinite loop. */

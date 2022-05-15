@@ -11,12 +11,13 @@
 #include <process_flash.h>
 #include <selector.h>
 
-//semaphore
+//semaphore camera
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
+//table of length equal to the number of dots and strokes sent in the full message
 static int morse[MSG_LOADED] = {0};
 
-// Morse logic avec direction
+// Morse logic to  direction = the 4 first strockes and points in table "morse"
 int morse_logic_direction(int morse_msg[]){
 
 	// B for Backwards "1000"
@@ -39,7 +40,6 @@ int morse_logic_direction(int morse_msg[]){
 	return 0;
 }
 
-
 // Distance is stored from 5th to 14th flash instruction
 // From 5 to 50 cm
 int morse_logic_distance(int morse_msg[]){
@@ -47,7 +47,7 @@ int morse_logic_distance(int morse_msg[]){
 	int dizaine = 0;
 	int unite = 0;
 
-	// Dizaine
+	// tens
 	// Zero "11111"
 	if((morse_msg[4]==LINE)&&(morse_msg[5]==LINE)&&(morse_msg[6]==LINE)&&(morse_msg[7]==LINE)&&(morse_msg[8]==LINE)){
 		dizaine = 0;
@@ -73,28 +73,28 @@ int morse_logic_distance(int morse_msg[]){
 		dizaine = 5;
 	}
 
-	// Unite
+	// ones
 	// Zero "11111"
 	if((morse_msg[9]==LINE)&&(morse_msg[10]==LINE)&&(morse_msg[11]==LINE)&&(morse_msg[12]==LINE)&&(morse_msg[13]==LINE)){
 		unite = 0;
 	}
-	// Un "01111"
+	// one "01111"
 	if((morse_msg[9]==DOT)&&(morse_msg[10]==LINE)&&(morse_msg[11]==LINE)&&(morse_msg[12]==LINE)&&(morse_msg[13]==LINE)){
 		unite = 1;
 	}
-	// Deux "00111"
+	// two "00111"
 	if((morse_msg[9]==DOT)&&(morse_msg[10]==DOT)&&(morse_msg[11]==LINE)&&(morse_msg[12]==LINE)&&(morse_msg[13]==LINE)){
 		unite = 2;
 	}
-	// Trois "00011"
+	// three "00011"
 	if((morse_msg[9]==DOT)&&(morse_msg[10]==DOT)&&(morse_msg[11]==DOT)&&(morse_msg[12]==LINE)&&(morse_msg[13]==LINE)){
 		unite = 3;
 	}
-	// Quatre "00001"
+	// four "00001"
 	if((morse_msg[9]==DOT)&&(morse_msg[10]==DOT)&&(morse_msg[11]==DOT)&&(morse_msg[12]==DOT)&&(morse_msg[13]==LINE)){
 		unite = 4;
 	}
-	// Cinq "00000"
+	// five "00000"
 	if((morse_msg[9]==DOT)&&(morse_msg[10]==DOT)&&(morse_msg[11]==DOT)&&(morse_msg[12]==DOT)&&(morse_msg[13]==DOT)){
 		unite = 5;
 	}
@@ -102,15 +102,15 @@ int morse_logic_distance(int morse_msg[]){
 	if((morse_msg[9]==LINE)&&(morse_msg[10]==DOT)&&(morse_msg[11]==DOT)&&(morse_msg[12]==DOT)&&(morse_msg[13]==DOT)){
 		unite = 6;
 	}
-	// Sept "11000"
+	// Seven "11000"
 	if((morse_msg[9]==LINE)&&(morse_msg[10]==LINE)&&(morse_msg[11]==DOT)&&(morse_msg[12]==DOT)&&(morse_msg[13]==DOT)){
 		unite = 7;
 	}
-	// Huit "11100"
+	// eight "11100"
 	if((morse_msg[9]==LINE)&&(morse_msg[10]==LINE)&&(morse_msg[11]==LINE)&&(morse_msg[12]==DOT)&&(morse_msg[13]==DOT)){
 		unite = 8;
 	}
-	// Neuf "11110"
+	// nine "11110"
 	if((morse_msg[9]==LINE)&&(morse_msg[10]==LINE)&&(morse_msg[11]==LINE)&&(morse_msg[12]==LINE)&&(morse_msg[13]==DOT)){
 		unite = 9;
 	}
@@ -132,13 +132,14 @@ int morse_logic_speed(int morse_msg[]){
 	return 0;
 }
 
-// Thread qui traite les datas des flashs
+//thread that processes camera data
 static THD_WORKING_AREA(waProcessFlash, 1024);
 static THD_FUNCTION(ProcessFlash, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
+    // capture image
 	po8030_advanced_config(FORMAT_RGB565, 315, 235,10,10, SUBSAMPLING_X1, SUBSAMPLING_X1);
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
@@ -151,6 +152,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 	messagebus_topic_init(&morse_topic, &morse_topic_lock, &morse_topic_condvar, &morse, sizeof(morse));
 	messagebus_advertise_topic(&bus, &morse_topic, "/morse");
 
+	// inits selector
 	int counter = 0;
 	int counter_delayed = 0;
 	int index = 0;
@@ -159,7 +161,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 
 	while(1){
 		selector_actual = get_selector();
-		if((selector_actual != selector_previous)){
+		if((selector_actual != selector_previous)){ // if selector switched
 			systime_t time;
 			time = chVTGetSystemTime();
 			 //starts a capture
@@ -171,7 +173,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 			// Uncomment if you want to setup for your room brightness with realterm
 			//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 			counter_delayed = counter;
-			// Justifier Threshold
+			// if capture time is less than the threshold
 			if (chVTGetSystemTime()-time <= THRESHOLD){
 				++counter;
 			}
@@ -180,7 +182,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 			}
 			if((counter_delayed > MIN_LENGTH_DOT)&&(counter_delayed <= MAX_LENGTH_DOT)){
 				if(counter == 0){
-					// Uncomment if you want to setup for your room brightness with realterm
+					//Uncomment if you want to setup for your room brightness with realterm
 					//chprintf((BaseSequentialStream *)&SD3, " DOT %c  ", 0);
 					morse[index] = DOT;
 					++index;
