@@ -66,7 +66,7 @@ static THD_FUNCTION(motor_control, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
-    //reception ofthe table "morse" from the tread process_flash
+    //reception of the table "morse" from the tread process_flash
     messagebus_topic_t *morse_topic = messagebus_find_topic_blocking(&bus, "/morse");
     uint32_t distance = 0;
     uint32_t speed = 0;
@@ -96,7 +96,7 @@ static THD_FUNCTION(motor_control, arg) {
         set_body_led(LED_ON);
         // Wait 1 sec with body led turned on to indicate end of movement or obstacle = not enough distance to advance
         chThdSleepMilliseconds(1000);
-        set_body_led(LED_OFF); // turns off bode leds
+        set_body_led(LED_OFF); // turns off body leds
         // stop the motors
         right_motor_set_speed(0);
         left_motor_set_speed(0);

@@ -56,7 +56,7 @@ int main(void)
 	po8030_start();
 	//inits the motors
 	motors_init();
-	// inits messasge bus
+	// inits message bus
 	messagebus_init(&bus, &bus_lock, &bus_condvar);
 	//starts the threads for the motor_control and the processing of the flashs
 	process_flash_start();
