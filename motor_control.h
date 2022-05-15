@@ -13,6 +13,8 @@
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
 #define SEC_TO_MS 1000
 #define CM_TO_MM 10
+#define LED_ON 1
+#define LED_OFF 0
 
 
 //start the motor_control thread

@@ -2,7 +2,7 @@
 #define PROCESS_FLASH_H
 
 #define THRESHOLD 50
-#define MIN_LENGTH_DOT 4
+#define MIN_LENGTH_DOT 2
 #define MAX_LENGTH_DOT 21
 #define MIN_LENGTH_LINE 30
 

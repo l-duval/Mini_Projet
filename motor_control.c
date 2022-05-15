@@ -9,6 +9,8 @@
 #include <msgbus/messagebus.h>
 #include <sensors/VL53L0X/VL53L0X.h>
 #include "process_flash.h"
+#include <leds.h>
+
 
 
 // Def speed
@@ -88,6 +90,10 @@ static THD_FUNCTION(motor_control, arg) {
        			chThdSleepMilliseconds(time_to_dist);
        		}
         }
+        set_body_led(LED_ON);
+        // Wait 1 sec with body led turned on to indicate end of movement or not enough distance to advance
+        chThdSleepMilliseconds(1000);
+        set_body_led(LED_OFF);
         right_motor_set_speed(0);
         left_motor_set_speed(0);
     }

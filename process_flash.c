@@ -168,6 +168,8 @@ static THD_FUNCTION(ProcessFlash, arg) {
 			wait_image_ready();
 			//signals an image has been captured
 			chBSemSignal(&image_ready_sem);
+			// Uncomment if you want to setup for your room brightness with realterm
+			//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 			counter_delayed = counter;
 			// Justifier Threshold
 			if (chVTGetSystemTime()-time <= THRESHOLD){
@@ -178,12 +180,16 @@ static THD_FUNCTION(ProcessFlash, arg) {
 			}
 			if((counter_delayed > MIN_LENGTH_DOT)&&(counter_delayed <= MAX_LENGTH_DOT)){
 				if(counter == 0){
+					// Uncomment if you want to setup for your room brightness with realterm
+					//chprintf((BaseSequentialStream *)&SD3, " DOT %c  ", 0);
 					morse[index] = DOT;
 					++index;
 				}
 			}
 			if(counter_delayed >= MIN_LENGTH_LINE){
 				if(counter == 0){
+					// Uncomment if you want to setup for your room brightness with realterm
+					//chprintf((BaseSequentialStream *)&SD3, " LINE %c  ", 0);
 					morse[index] = LINE;
 					++index;
 				}
