@@ -74,21 +74,15 @@ static THD_FUNCTION(motor_control, arg) {
         messagebus_topic_wait(morse_topic, &morse, sizeof(morse));
         // Rotation of e puck
         rotate(morse_logic_direction(morse));
-        chprintf((BaseSequentialStream *)&SD3, "tof dist %d ", VL53L0X_get_dist_mm());
         distance = (uint32_t)morse_logic_distance(morse);
-        chprintf((BaseSequentialStream *)&SD3, "morse dist %d ", distance);
         speed = (uint32_t)def_speed(morse_logic_speed(morse));
-        chprintf((BaseSequentialStream *)&SD3, "morse speed %d ", speed);
-        chprintf((BaseSequentialStream *)&SD3, "dist*10 %d ", 10*distance);
         // 3 seconds to get flash device out of the way if going forward
         chThdSleepMilliseconds(3000);
         // Recherche obstacle avant d'avancer sur la distance a parcourir
         if(VL53L0X_get_dist_mm() > (CM_TO_MM*distance)){ // convert distance to mm
-        	chprintf((BaseSequentialStream *)&SD3, "obstacle ok %d ",0);
         	right_motor_set_speed(speed);
         	left_motor_set_speed(speed);
        		systime_t time_to_dist = (NSTEP_ONE_TURN/WHEEL_PERIMETER*SEC_TO_MS*distance)/speed;
-       		chprintf((BaseSequentialStream *)&SD3, "time to dist %d", time_to_dist);
        		// Si distance nulle n'avance pas
        		if(time_to_dist != 0){
        			chThdSleepMilliseconds(time_to_dist);
