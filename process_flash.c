@@ -12,7 +12,7 @@
 #include <selector.h>
 
 //semaphore camera
-static BSEMAPHORE_DECL(image_ready_sem, TRUE);
+//static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
 //table of length equal to the number of dots and strokes sent in the full message
 static int morse[MSG_LOADED] = {0};
@@ -141,7 +141,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 
     // capture image
 	po8030_advanced_config(FORMAT_RGB565, 315, 235,10,10, SUBSAMPLING_X1, SUBSAMPLING_X1);
-	dcmi_enable_double_buffering();
+	//dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
 
@@ -169,7 +169,7 @@ static THD_FUNCTION(ProcessFlash, arg) {
 			//waits for the capture to be done
 			wait_image_ready();
 			//signals an image has been captured
-			chBSemSignal(&image_ready_sem);
+			//chBSemSignal(&image_ready_sem);
 			// Uncomment if you want to setup for your room brightness with realterm
 			//chprintf((BaseSequentialStream *)&SD3, "ct %d", chVTGetSystemTime()-time);
 			counter_delayed = counter;
